@@ -32,6 +32,10 @@ import com.empatica.empalink.config.EmpaSensorType;
 import com.empatica.empalink.config.EmpaStatus;
 import com.empatica.empalink.delegate.EmpaDataDelegate;
 import com.empatica.empalink.delegate.EmpaStatusDelegate;
+import com.model.Data;
+import com.webSocket.WebSocketHandler;
+
+import java.net.InetSocketAddress;
 
 
 public class MainActivity extends AppCompatActivity implements EmpaDataDelegate, EmpaStatusDelegate {
@@ -69,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     private TextView deviceNameLabel;
 
     private LinearLayout dataCnt;
+
+    private WebSocketHandler server;
 
 
     @Override
@@ -117,6 +123,10 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
         });
 
         initEmpaticaDeviceManager();
+
+        System.out.println("Will try to initiate webSocket");
+        server = new WebSocketHandler(new InetSocketAddress(8082));
+        server.start();
     }
 
     @Override
@@ -198,6 +208,13 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
         super.onDestroy();
         if (deviceManager != null) {
             deviceManager.cleanUp();
+        }
+        if (server != null) {
+            try {
+                server.stop();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -325,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     @Override
     public void didReceiveBVP(float bvp, double timestamp) {
         updateLabel(bvpLabel, "" + bvp);
+        Data.getInstance().setBVP(bvp);
     }
 
     @Override
@@ -335,11 +353,13 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     @Override
     public void didReceiveGSR(float gsr, double timestamp) {
         updateLabel(edaLabel, "" + gsr);
+        Data.getInstance().setGSR(gsr);
     }
 
     @Override
     public void didReceiveIBI(float ibi, double timestamp) {
         updateLabel(ibiLabel, "" + ibi);
+        Data.getInstance().setIBI(ibi);
     }
 
     @Override
