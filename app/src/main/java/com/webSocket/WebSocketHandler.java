@@ -1,6 +1,6 @@
 package com.webSocket;
 
-import com.model.Data;
+import com.model.DataManager;
 
 import org.java_websocket.server.WebSocketServer;
 import org.java_websocket.WebSocket;
@@ -50,8 +50,10 @@ public class WebSocketHandler extends WebSocketServer {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!socket.getConnections().isEmpty()) {
-                    String message = Data.getInstance().getDataAsJson();
+                if (!socket.getConnections().isEmpty() &&
+                        DataManager.getInstance().getDidBVPChange() &&
+                        DataManager.getInstance().getDidGSRChange()) {
+                    String message = DataManager.getInstance().getDataAsJson();
                     System.out.println("**" + message);
                     socket.broadcast(message);
                 }

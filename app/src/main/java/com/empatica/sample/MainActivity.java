@@ -32,7 +32,7 @@ import com.empatica.empalink.config.EmpaSensorType;
 import com.empatica.empalink.config.EmpaStatus;
 import com.empatica.empalink.delegate.EmpaDataDelegate;
 import com.empatica.empalink.delegate.EmpaStatusDelegate;
-import com.model.Data;
+import com.model.DataManager;
 import com.webSocket.WebSocketHandler;
 
 import java.net.InetSocketAddress;
@@ -52,19 +52,11 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
     private EmpaDeviceManager deviceManager = null;
 
-    private TextView accel_xLabel;
-
-    private TextView accel_yLabel;
-
-    private TextView accel_zLabel;
-
     private TextView bvpLabel;
 
     private TextView edaLabel;
 
     private TextView ibiLabel;
-
-    private TextView temperatureLabel;
 
     private TextView batteryLabel;
 
@@ -89,19 +81,11 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
         dataCnt = (LinearLayout) findViewById(R.id.dataArea);
 
-        accel_xLabel = (TextView) findViewById(R.id.accel_x);
-
-        accel_yLabel = (TextView) findViewById(R.id.accel_y);
-
-        accel_zLabel = (TextView) findViewById(R.id.accel_z);
-
         bvpLabel = (TextView) findViewById(R.id.bvp);
 
         edaLabel = (TextView) findViewById(R.id.eda);
 
         ibiLabel = (TextView) findViewById(R.id.ibi);
-
-        temperatureLabel = (TextView) findViewById(R.id.temperature);
 
         batteryLabel = (TextView) findViewById(R.id.battery);
 
@@ -333,16 +317,9 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     }
 
     @Override
-    public void didReceiveAcceleration(int x, int y, int z, double timestamp) {
-        updateLabel(accel_xLabel, "" + x);
-        updateLabel(accel_yLabel, "" + y);
-        updateLabel(accel_zLabel, "" + z);
-    }
-
-    @Override
     public void didReceiveBVP(float bvp, double timestamp) {
         updateLabel(bvpLabel, "" + bvp);
-        Data.getInstance().setBVP(bvp);
+        DataManager.getInstance().setBVP(bvp);
     }
 
     @Override
@@ -353,18 +330,23 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     @Override
     public void didReceiveGSR(float gsr, double timestamp) {
         updateLabel(edaLabel, "" + gsr);
-        Data.getInstance().setGSR(gsr);
+        DataManager.getInstance().setGSR(gsr);
     }
 
     @Override
     public void didReceiveIBI(float ibi, double timestamp) {
         updateLabel(ibiLabel, "" + ibi);
-        Data.getInstance().setIBI(ibi);
+        DataManager.getInstance().setIBI(ibi);
     }
 
     @Override
     public void didReceiveTemperature(float temp, double timestamp) {
-        updateLabel(temperatureLabel, "" + temp);
+        // this is breaking the I in SOLID :(
+    }
+
+    @Override
+    public void didReceiveAcceleration(int x, int y, int z, double timestamp) {
+        // this is breaking the I in SOLID :(
     }
 
     // Update a label with some text, making sure this is run in the UI thread
